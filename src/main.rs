@@ -20,12 +20,20 @@ async fn main() -> Result<(), ()> {
     let contents = fs::read_to_string(&file_name)
         .expect("Should have been able to read the file have you made a commit yet?");
     let re = Regex::new(r"^(?P<issue_no>\w+-\d+) ").unwrap();
-    let message_id = re
-        .captures(&contents)
-        .unwrap()
-        .name("issue_no")
-        .unwrap()
-        .as_str();
+
+    let message_id = match re.captures(&contents) {
+        Some(m) => match m.name("issue_no") {
+            Some(mes) => mes.as_str(),
+            None => {
+                println!("Your Issue does not appear to start with an Issue");
+                return Err(());
+            }
+        },
+        None => {
+            println!("Your Issue does not appear to start with an Issue");
+            return Err(());
+        }
+    };
 
     let issue_found: Result<bool, bool>;
 
