@@ -17,12 +17,9 @@ pub async fn get_config() -> CopiaConfig {
         Ok(cfg) => cfg,
         Err(_) => {
             let config = CopiaConfig::default();
-            set_config(config).await
+            return set_config(config).await;
         }
     };
-
-    let file = confy::get_configuration_file_path("copia", "check_commit_for_issue").unwrap();
-    println!("Configuration file path is: {:#?}", file);
 
     if !(config.jira_email == "")
         || !(config.jira_password == "")
@@ -36,6 +33,9 @@ pub async fn get_config() -> CopiaConfig {
 }
 
 async fn set_config(mut config: CopiaConfig) -> CopiaConfig {
+    let file = confy::get_configuration_file_path("copia", "check_commit_for_issue").unwrap();
+    println!("Configuration file path is: {:#?}", file);
+
     let stdin = io::stdin();
     let mut reader = FramedRead::new(stdin, LinesCodec::new());
     if config.jira_email == "" {
