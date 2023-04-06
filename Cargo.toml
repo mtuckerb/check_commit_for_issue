@@ -1,0 +1,21 @@
+[package]
+name = "check_commit_for_issue"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+reqwest = { version = "0.11", default-features = false, features = ["json", "rustls-tls"] }
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1"
+regex = "1"
+redis = { version = "0.22.3", features = ["tokio-native-tls-comp"] }
+base64 = { version = "0"}
+confy = "0.5.1"
+serde_derive = "1.0.159"
+tokio-util = { version = "0.7.7", features = ["full"] }
+futures-util = "0.3.28"
+
+
