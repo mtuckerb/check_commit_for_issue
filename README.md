@@ -26,5 +26,6 @@ If you have redis running on `localhost`, it will cache the API responses, makin
     ```
     <path_to_repo>/.git/hooks/check_commit_for_issue
     ``` 
+6. (Optional) Install redis. On MacOS `brew install redis; brew services start redis;`
 
 That's all. 
