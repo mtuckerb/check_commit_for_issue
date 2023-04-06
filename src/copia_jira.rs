@@ -1,4 +1,5 @@
 use crate::copia_redis;
+use crate::get_config;
 use copia_redis::set_redis;
 use serde::{Deserialize, Serialize};
 
@@ -15,12 +16,12 @@ struct Obj {
 pub async fn lookup_issue(
     message_id: &str,
     auth_token: &str,
-    board_id: &str,
+    config: &get_config::CopiaConfig,
 ) -> Result<bool, bool> {
     let sprint = reqwest::Client::new()
         .get(format!(
-            "https://gocopia.atlassian.net/rest/agile/1.0/board/{}/sprint?state=active",
-            &board_id.to_string()
+            "https://{}.atlassian.net/rest/agile/1.0/board/{}/sprint?state=active",
+            config.subdomain, config.board_id
         ))
         .header("Content-Type", "application/json")
         .header("Authorization", format!("Basic {}", &auth_token))
@@ -33,8 +34,8 @@ pub async fn lookup_issue(
 
     let issues = reqwest::Client::new()
         .get(format!(
-            "https://gocopia.atlassian.net/rest/agile/1.0/board/71/sprint/{}/issue",
-            sprint_id
+            "https://{}.atlassian.net/rest/agile/1.0/board/{}/sprint/{}/issue",
+            config.subdomain, config.board_id, sprint_id
         ))
         .header("Content-Type", "application/json")
         .header("Authorization", format!("Basic {}", auth_token))

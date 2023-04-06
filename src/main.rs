@@ -33,7 +33,7 @@ async fn main() -> Result<(), ()> {
         Ok(_) => {
             return Ok(());
         }
-        Err(_) => issue_found = lookup_issue(&message_id, &auth_token, &config.board_id).await,
+        Err(_) => issue_found = lookup_issue(&message_id, &auth_token, &config).await,
     }
 
     return match issue_found {
