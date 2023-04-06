@@ -5,18 +5,18 @@ use tokio::io;
 use tokio_util::codec::{FramedRead, LinesCodec};
 
 #[derive(Default, Debug, Serialize, Deserialize)]
-pub struct CopiaConfig {
+pub struct MtuckerbConfig {
     pub jira_email: String,
     pub jira_password: String,
     pub board_id: String,
     pub subdomain: String,
 }
 
-pub async fn get_config() -> CopiaConfig {
-    let config: CopiaConfig = match confy::load("copia", "check_commit_for_issue") {
+pub async fn get_config() -> MtuckerbConfig {
+    let config: MtuckerbConfig = match confy::load("mtuckerb", "check_commit_for_issue") {
         Ok(cfg) => cfg,
         Err(_) => {
-            let config = CopiaConfig::default();
+            let config = MtuckerbConfig::default();
             return set_config(config).await;
         }
     };
@@ -32,8 +32,8 @@ pub async fn get_config() -> CopiaConfig {
     set_config(config).await
 }
 
-async fn set_config(mut config: CopiaConfig) -> CopiaConfig {
-    let file = confy::get_configuration_file_path("copia", "check_commit_for_issue").unwrap();
+async fn set_config(mut config: MtuckerbConfig) -> MtuckerbConfig {
+    let file = confy::get_configuration_file_path("mtuckerb", "check_commit_for_issue").unwrap();
     println!("Configuration file path is: {:#?}", file);
 
     let stdin = io::stdin();
@@ -54,7 +54,7 @@ async fn set_config(mut config: CopiaConfig) -> CopiaConfig {
         println!("\nLastly, please enter the subdomain for your Atlassian cloud");
         config.subdomain = reader.next().await.transpose().unwrap().unwrap();
     }
-    confy::store("copia", "check_commit_for_issue", &config)
+    confy::store("mtuckerb", "check_commit_for_issue", &config)
         .expect("Failed to store configuration");
     return config;
 }

@@ -3,17 +3,17 @@ use std::env;
 use std::fs;
 
 extern crate base64;
-mod copia_jira;
-mod copia_redis;
 mod get_config;
+mod mtuckerb_jira;
+mod mtuckerb_redis;
 use base64::{engine::general_purpose, Engine as _};
-use copia_jira::lookup_issue;
-use copia_redis::check_redis;
 use get_config::get_config;
+use mtuckerb_jira::lookup_issue;
+use mtuckerb_redis::check_redis;
 
 #[tokio::main]
 async fn main() -> Result<(), ()> {
-    let config: get_config::CopiaConfig = get_config().await;
+    let config: get_config::MtuckerbConfig = get_config().await;
     let file_name = get_filename();
     let auth_token = general_purpose::STANDARD_NO_PAD
         .encode(format!("{}:{}", &config.jira_email, &config.jira_password));

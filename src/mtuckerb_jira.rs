@@ -1,6 +1,6 @@
-use crate::copia_redis;
 use crate::get_config;
-use copia_redis::set_redis;
+use crate::mtuckerb_redis;
+use mtuckerb_redis::set_redis;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -16,7 +16,7 @@ struct Obj {
 pub async fn lookup_issue(
     message_id: &str,
     auth_token: &str,
-    config: &get_config::CopiaConfig,
+    config: &get_config::MtuckerbConfig,
 ) -> Result<bool, bool> {
     let sprint = reqwest::Client::new()
         .get(format!(
