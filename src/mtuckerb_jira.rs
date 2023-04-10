@@ -17,7 +17,7 @@ pub async fn lookup_issue(
     message_id: &str,
     auth_token: &str,
     config: &get_config::MtuckerbConfig,
-) -> Result<bool, bool> {
+) -> Result<bool, String> {
     let sprint = reqwest::Client::new()
         .get(format!(
             "https://{}.atlassian.net/rest/agile/1.0/board/{}/sprint?state=active",
@@ -27,14 +27,18 @@ pub async fn lookup_issue(
         .header("Authorization", format!("Basic {}", &auth_token))
         .send()
         .await
-        .unwrap()
+        .expect("Could not connect to Jira")
         .json::<serde_json::Value>()
         .await;
-    let sprint_id = &sprint.unwrap()["values"][0]["id"].to_string();
+
+    let sprint_id = match sprint {
+        Ok(val) => val["values"][0]["id"].to_string(),
+        Err(_) => "Couldn't find sprint_id".to_string(),
+    };
 
     let issues = reqwest::Client::new()
         .get(format!(
-            "https://{}.atlassian.net/rest/agile/1.0/board/{}/sprint/{}/issue",
+            "https://{}.atlassian.net/rest/agile/1.0/board/{}/sprint/{}/issue?maxResults=1000",
             config.subdomain, config.board_id, sprint_id
         ))
         .header("Content-Type", "application/json")
@@ -48,15 +52,15 @@ pub async fn lookup_issue(
     let mut result: bool = false;
 
     for i in &issues.unwrap().issues {
-        set_redis(&i.key);
+        let _ = set_redis(&i.key);
         if i.key.eq(message_id) {
-            println!("{:#?} is in the current Sprint. Nice!", &i.key);
+            println!("✅ {:#?} found in Jira!", &i.key);
             result = true;
             break;
         };
     }
     return match result {
         true => Ok(result),
-        false => Err(result),
+        false => Err("🛑 Issue not found in Jira".to_owned()),
     };
 }

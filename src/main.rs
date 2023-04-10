@@ -1,7 +1,6 @@
 use regex::Regex;
 use std::env;
 use std::fs;
-
 extern crate base64;
 mod get_config;
 mod mtuckerb_jira;
@@ -12,7 +11,7 @@ use mtuckerb_jira::lookup_issue;
 use mtuckerb_redis::check_redis;
 
 #[tokio::main]
-async fn main() -> Result<(), ()> {
+async fn main() -> Result<(), String> {
     let config: get_config::MtuckerbConfig = get_config().await;
     let file_name = get_filename();
     let auth_token = general_purpose::STANDARD_NO_PAD
@@ -26,28 +25,32 @@ async fn main() -> Result<(), ()> {
             Some(mes) => mes.as_str(),
             None => {
                 println!("Your Issue does not appear to start with an Issue");
-                return Err(());
+                return Err("Your Issue does not appear to start with an Issue".to_owned());
             }
         },
         None => {
             println!("Your Issue does not appear to start with an Issue");
-            return Err(());
+            return Err("Your Issue does not appear to start with an Issue".to_owned());
         }
     };
 
-    let issue_found: Result<bool, bool>;
+    let issue_found: Result<bool, String>;
 
     match check_redis(&message_id) {
-        Ok(_) => {
+        Ok(msg) => {
+            println!("✅ {}", msg);
             return Ok(());
         }
-        Err(_) => issue_found = lookup_issue(&message_id, &auth_token, &config).await,
+        Err(e) => {
+            println!("Reids lookup failed: {}", e);
+            issue_found = lookup_issue(&message_id, &auth_token, &config).await;
+        }
     }
 
-    return match issue_found {
+    match issue_found {
         Ok(_) => Ok(()),
-        Err(_) => Err(()),
-    };
+        Err(e) => Err(format!("🛑 {}", e).to_owned()),
+    }
 }
 
 fn get_filename() -> String {
@@ -59,3 +62,20 @@ fn get_filename() -> String {
     };
     file_name
 }
+
+// #[cfg(test)]
+// mod tests {
+//     use super::*;
+
+//     #[automock]
+//     trait Filename {
+//         fn get_filename(valid: bool) -> String {
+//             return "./src/test_files/valid".to_string();
+//         }
+//     }
+//     #[tokio::test]
+//     async fn it_works() {
+//         let mut mock = MockFilename::new();
+//         assert_eq!(Ok(()), main().await);
+//     }
+// }
