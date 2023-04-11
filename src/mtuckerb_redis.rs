@@ -38,6 +38,7 @@ pub fn set_redis(message_id: &str) -> Result<(), String> {
     }
 }
 
+#[cfg(test)]
 pub fn del_redis(message_id: &str) -> Result<(), String> {
     use redis::Commands;
     match redis::Client::open("redis://127.0.0.1/") {
