@@ -9,9 +9,24 @@ use base64::{engine::general_purpose, Engine as _};
 use get_config::get_config;
 use mtuckerb_jira::lookup_issue;
 use mtuckerb_redis::check_redis;
+use colored::Colorize;
+use std::process::ExitCode;
 
 #[tokio::main]
-async fn main() -> Result<(), String> {
+async fn main() -> ExitCode {
+    use std::io::{self, Write};
+    match real_main().await {
+        Ok(_) => ExitCode::SUCCESS,
+        Err(e) => {
+            let stderr = io::stderr();
+            let _ = writeln!(&mut &stderr, "Error: {e}");
+            ExitCode::FAILURE
+        }
+    }
+}
+
+
+async fn real_main() -> Result<(), String> {
     let config: get_config::MtuckerbConfig = get_config().await;
     let file_name = get_filename();
     let auth_token = general_purpose::STANDARD_NO_PAD
@@ -38,18 +53,18 @@ async fn main() -> Result<(), String> {
 
     match check_redis(&message_id) {
         Ok(msg) => {
-            println!("✅ {}", msg);
+            println!("✅ {}", msg.green().bold());
             return Ok(());
         }
         Err(e) => {
-            println!("Reids lookup failed: {}", e);
+            println!("{} {}", "Reids lookup failed:".red().bold(), e.red().bold());
             issue_found = lookup_issue(&message_id, &auth_token, &config).await;
         }
     }
 
     match issue_found {
         Ok(_) => Ok(()),
-        Err(e) => Err(format!("🛑 {}", e).to_owned()),
+        Err(e) => Err(format!("{}", e.red().bold() )),
     }
 }
 
