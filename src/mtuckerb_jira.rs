@@ -3,6 +3,7 @@ use crate::mtuckerb_redis;
 use mtuckerb_redis::set_redis;
 use serde::{Deserialize, Serialize};
 
+
 #[derive(Debug, Serialize, Deserialize)]
 struct Issue {
     id: String,
@@ -67,6 +68,6 @@ pub async fn lookup_issue(
     }
     return match result {
         true => Ok(result),
-        false => Err("🛑 Issue not found in Jira".to_owned()),
+        false => Err(format!("🛑 Issue not found in Jira!")),
     };
 }
