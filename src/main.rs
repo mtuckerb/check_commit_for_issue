@@ -39,13 +39,11 @@ async fn real_main() -> Result<(), String> {
         Some(m) => match m.name("issue_no") {
             Some(mes) => mes.as_str(),
             None => {
-                println!("Your Issue does not appear to start with an Issue");
-                return Err("Your Issue does not appear to start with an Issue".to_owned());
+                return Err(format!("{}", "Your commit does not appear to start with an Issue".red().bold()));
             }
         },
         None => {
-            println!("Your Issue does not appear to start with an Issue");
-            return Err("Your Issue does not appear to start with an Issue".to_owned());
+            return Err(format!("{}", "Your commit does not appear to start with an Issue".red().bold()));
         }
     };
 
