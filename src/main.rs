@@ -19,7 +19,7 @@ async fn main() -> ExitCode {
         Ok(_) => ExitCode::SUCCESS,
         Err(e) => {
             let stderr = io::stderr();
-            let _ = writeln!(&mut &stderr, "Error: {e}");
+            let _ = writeln!(&mut &stderr, "{e}");
             ExitCode::FAILURE
         }
     }
