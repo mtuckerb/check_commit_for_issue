@@ -3,6 +3,11 @@ use futures_util::StreamExt;
 use serde_derive::{Deserialize, Serialize};
 use tokio::io;
 use tokio_util::codec::{FramedRead, LinesCodec};
+use crate::mtuckerb_add_git_commit_msg_hook;
+use mtuckerb_add_git_commit_msg_hook::add_hook;
+use regex::Regex;
+use std::fs;
+
 
 #[derive(Default, Debug, Serialize, Deserialize)]
 pub struct MtuckerbConfig {
@@ -17,7 +22,7 @@ pub async fn get_config() -> MtuckerbConfig {
         Ok(cfg) => cfg,
         Err(_) => {
             let config = MtuckerbConfig::default();
-            return set_config(config).await;
+            return set_config().await;
         }
     };
 
@@ -29,10 +34,12 @@ pub async fn get_config() -> MtuckerbConfig {
         return config;
     }
 
-    set_config(config).await
+    set_config().await
 }
 
-async fn set_config(mut config: MtuckerbConfig) -> MtuckerbConfig {
+
+pub async fn set_config() -> MtuckerbConfig {
+    let mut config: MtuckerbConfig =  confy::load("mtuckerb", "check_commit_for_issue").unwrap();
     let file = confy::get_configuration_file_path("mtuckerb", "check_commit_for_issue").unwrap();
     println!("Configuration file path is: {:#?}", file);
 
@@ -56,5 +63,32 @@ async fn set_config(mut config: MtuckerbConfig) -> MtuckerbConfig {
     }
     confy::store("mtuckerb", "check_commit_for_issue", &config)
         .expect("Failed to store configuration");
+
+    println!("Would you like me to add the git hook for you? (Y/N)");
+    if reader.next().await.transpose().unwrap().unwrap().to_lowercase() == "y"  {
+        match add_hook() {
+            Ok(msg) => {
+                println!("{}", msg)
+            },
+            Err(e) => {println!("{}", e)}
+        }
+    }
+    match std::env::current_exe() {
+        Ok(exe_path) => {
+            let path_string = exe_path.display().to_string();
+            let re = Regex::new(r"^/usr/local/bin/").unwrap();
+            if !re.is_match(&path_string){
+                println!("Your executable is in {}. Would you like to move it to /usr/local/bin? (Y/N)", &path_string);
+                if reader.next().await.transpose().unwrap().unwrap().to_lowercase() == "y" {
+                    match fs::copy(&path_string, "/usr/local/bin/check_commit_for_issue") {
+                        Ok(_) => {println!("Moved the executable to /usr/local/bin/check_commit_for_issue")},
+                        Err(e) => {println!("{}", e)}
+                    }
+                };
+            };
+        
+        },
+        Err(e) => println!("{}",e),
+    }
     return config;
 }

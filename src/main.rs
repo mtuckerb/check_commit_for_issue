@@ -5,11 +5,13 @@ extern crate base64;
 mod get_config;
 mod mtuckerb_jira;
 mod mtuckerb_redis;
+mod mtuckerb_add_git_commit_msg_hook;
+
 use base64::{engine::general_purpose, Engine as _};
-use get_config::get_config;
+use colored::Colorize;
+use get_config::{get_config, set_config};
 use mtuckerb_jira::lookup_issue;
 use mtuckerb_redis::check_redis;
-use colored::Colorize;
 use std::process::ExitCode;
 
 #[tokio::main]
@@ -25,25 +27,56 @@ async fn main() -> ExitCode {
     }
 }
 
-
 async fn real_main() -> Result<(), String> {
+    let args: Vec<String> = env::args().collect();
+    if args.contains(&"--config".to_string()) || args.len() < 1 {
+        println!("launching config");
+        set_config().await;
+    }
+
     let config: get_config::MtuckerbConfig = get_config().await;
-    let file_name = get_filename();
+    
+    let file_name = match get_filename() {
+        Ok(file_name) => file_name,
+        Err(..) => {
+            return Err(format!(
+                "{}",
+                "Please provide a valid filename.".red().bold()
+            ));
+        }
+    };
+   
+
     let auth_token = general_purpose::STANDARD_NO_PAD
         .encode(format!("{}:{}", &config.jira_email, &config.jira_password));
-    let contents = fs::read_to_string(&file_name)
-        .expect("Should have been able to read the file have you made a commit yet?");
+    let contents = match fs::read_to_string(&file_name) {
+        Ok(content) => content,
+        Err(..) => {
+            return Err(format!("{}", "Please provide a valid filename. e.g.: check_commit_for_issues .git/COMMIT_EDITMSG".red().bold()));
+        }
+    };
+    // .expect("Should have been able to read the file have you made a commit yet?");
     let re = Regex::new(r"^(?P<issue_no>\w+-\d+) ").unwrap();
 
     let message_id = match re.captures(&contents) {
         Some(m) => match m.name("issue_no") {
             Some(mes) => mes.as_str(),
             None => {
-                return Err(format!("{}", "Your commit does not appear to start with an Issue".red().bold()));
+                return Err(format!(
+                    "{}",
+                    "Your commit does not appear to start with an Issue"
+                        .red()
+                        .bold()
+                ));
             }
         },
         None => {
-            return Err(format!("{}", "Your commit does not appear to start with an Issue".red().bold()));
+            return Err(format!(
+                "{}",
+                "Your commit does not appear to start with an Issue"
+                    .red()
+                    .bold()
+            ));
         }
     };
 
@@ -62,18 +95,18 @@ async fn real_main() -> Result<(), String> {
 
     match issue_found {
         Ok(_) => Ok(()),
-        Err(e) => Err(format!("{}", e.red().bold() )),
+        Err(e) => Err(format!("{}", e.red().bold())),
     }
 }
 
-fn get_filename() -> String {
+fn get_filename() -> Result<String, String> {
     let args: Vec<String> = env::args().collect();
-    let file_name: String = if args.len() > 0 {
-        args[1].clone()
+
+    if args.len() > 1 {
+        return Ok(args[1].clone());
     } else {
-        "./git/COMMIT_EDITMSG".to_string()
+        return Ok("./git/COMMIT_EDITMSG".to_string());
     };
-    file_name
 }
 
 // #[cfg(test)]

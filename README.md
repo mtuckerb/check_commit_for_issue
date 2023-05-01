@@ -17,15 +17,8 @@ If you have redis running on `localhost`, it will cache the API responses, makin
     ```
     cp ./target/release/check_commit_for_issue <path_to_repo>/.git/hooks
     ```
-4. Copy the sample hook into your local git repo;
-   ```
-    cp hooks/commit_msg <path_to_repo>/.git/hooks
-   ```
-   or copy/paste the contents
-5. Run the binary without any arguments to configure it;
-    ```
-    <path_to_repo>/.git/hooks/check_commit_for_issue
-    ``` 
-6. (Optional) Install redis. On MacOS `brew install redis; brew services start redis;`
+3. run the binary with --config to configure
+    `./check_commit_for_issue --config`
+4. (Optional) Install redis. On MacOS `brew install redis; brew services start redis;`
 
 That's all. 
