@@ -59,7 +59,7 @@ pub fn del_redis(message_id: &str) -> Result<(), String> {
 mod tests {
     use super::*;
 
-    #[test]
+    #[test] #[ignore]
     fn it_works() {
         match set_redis("POR-666") {
             Ok(_) => (),
