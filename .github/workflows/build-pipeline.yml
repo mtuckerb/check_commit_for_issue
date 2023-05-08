@@ -40,6 +40,7 @@ jobs:
           asset_name: check_commit_for_issue-${{ github.event.release.tag-name }}-linux-x86_64.tar.gz
           asset_path: target/x86_64-unknown-linux-musl/release/check_commit_for_issue.tar.gz
           upload_url: ${{ github.event.release.upload_url }}
+          asset_content_type: application/octet-stream
 
   macos-x86_64:
     runs-on: macos-latest
@@ -76,6 +77,7 @@ jobs:
           asset_name: check_commit_for_issue-${{ github.event.release.tag-name }}-macos-x86_64.dmg
           asset_path: target/release/check_commit_for_issue.dmg
           upload_url: ${{ github.event.release.upload_url }}
+          asset_content_type: application/octet-stream
 
   windows-x86_64:
     runs-on: windows-latest
@@ -103,3 +105,4 @@ jobs:
           asset_name: check_commit_for_issue-${{ github.event.release.tag-name }}-windows-x86_64.exe
           asset_path: target/release/check_commit_for_issue.exe
           upload_url: ${{ github.event.release.upload_url }}
+          asset_content_type: application/octet-stream
