@@ -71,3 +71,4 @@ pub async fn lookup_issue(
         false => Err(format!("🛑 Issue not found in Jira!")),
     };
 }
+
