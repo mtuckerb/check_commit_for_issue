@@ -23,7 +23,7 @@ jobs:
         with:
           command: build
           args: --release --target x86_64-unknown-linux-musl
-          use-cross: true
+          use-cross: false
 
       - name: Optimize and package binary
         run: |
@@ -76,33 +76,5 @@ jobs:
         with:
           asset_name: check_commit_for_issue-${{ github.event.release.tag-name }}-macos-x86_64.dmg
           asset_path: target/release/check_commit_for_issue.dmg
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_content_type: application/octet-stream
-
-  windows-x86_64:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v1
-
-      - uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: stable
-          default: true
-
-      - name: Build binary
-        uses: actions-rs/cargo@v1
-        with:
-          command: build
-          args: --release
-          use-cross: true
-
-      - name: Upload binary
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          asset_name: check_commit_for_issue-${{ github.event.release.tag-name }}-windows-x86_64.exe
-          asset_path: target/release/check_commit_for_issue.exe
           upload_url: ${{ github.event.release.upload_url }}
           asset_content_type: application/octet-stream
