@@ -1,5 +1,4 @@
 use std::path::Path;
-use std::fs;
 use std::fs::OpenOptions;
 use std::io::prelude::*;
 use std::os::unix::fs::OpenOptionsExt;

@@ -34,7 +34,7 @@ pub fn set_redis(message_id: &str) -> Result<(), String> {
                 Err(e) => return Err(format!("Failed to set value in Redis {}", e)),
             };
         }
-        Err(e) => return Err(e.to_string()),
+        Err(e) => return Err(format!("{}", e.to_string())),
     }
 }
 
@@ -61,10 +61,14 @@ mod tests {
 
     #[test]
     fn it_works() {
-        set_redis("POR-666");
+        match set_redis("POR-666") {
+            Ok(_) => (),
+            Err(_) =>  (),
+        }
         assert!(check_redis("POR-666").is_ok());
         assert_ne!(check_redis("POR-01"), Ok("It workded".to_string()));
-        del_redis("{POR-01}");
-        del_redis("POR-666");
+
+        del_redis("{POR-01}").expect("Failed to delete value in Redis");
+        del_redis("POR-666").expect("Failed to delete value in Redis");
     }
 }

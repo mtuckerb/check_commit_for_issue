@@ -21,7 +21,6 @@ pub async fn get_config() -> MtuckerbConfig {
     let config: MtuckerbConfig = match confy::load("mtuckerb", "check_commit_for_issue") {
         Ok(cfg) => cfg,
         Err(_) => {
-            let config = MtuckerbConfig::default();
             return set_config().await;
         }
     };
