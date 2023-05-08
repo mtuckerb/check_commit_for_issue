@@ -12,7 +12,7 @@ If you have redis running on `localhost`, it will cache the API responses, makin
     ```
     cargo build --release
     ```
-    or if you are on MacOS, you can just use the one in `./hooks`;
+    or if you are on MacOS, you can just use the one in https://github.com/mtuckerb/check_commit_for_issue/releases`;
 2. Copy that into your local git repo; 
     ```
     cp ./target/release/check_commit_for_issue <path_to_repo>/.git/hooks
