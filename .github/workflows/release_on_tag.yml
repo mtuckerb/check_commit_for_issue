@@ -36,24 +36,11 @@ jobs:
           mkdir dmg
           mv check_commit_for_issue dmg/
           hdiutil create -fs HFS+ -srcfolder dmg -volname check_commit_for_issue check_commit_for_issue.dmg
-
-      # - name: Upload binary
-      #   uses: actions/upload-release-asset@v1
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   with:
-      #     asset_name: check_commit_for_issue-${{ github.event.release.tag-name }}-macos-x86_64.dmg
-      #     asset_path: target/release/check_commit_for_issue.dmg
-      #     upload_url: ${{ github.event.release.upload_url }}
-      #     asset_content_type: application/octet-stream
-  tagged-release:
-    name: "Tagged Release"
-    runs-on: "ubuntu-latest"
-
-    steps:
-      - uses: "marvinpinto/action-automatic-releases@latest"
+      
+      - name: Create Release
+        uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
-          files: check_commit_for_issue-${{ github.event.release.tag-name }}-macos-x86_64.dmg 
+          files: target/release/check_commit_for_issue.dmg 
            
