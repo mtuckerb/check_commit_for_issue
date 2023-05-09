@@ -1,8 +1,15 @@
 use std::path::Path;
 use std::fs::OpenOptions;
 use std::io::prelude::*;
-use std::os::unix::fs::OpenOptionsExt;
 
+
+#[cfg(not(target_os = "macos"))]
+pub fn add_hook() -> Result<String, String> {
+  Ok()
+}
+
+#[cfg(target_os = "macos")]
+use std::os::unix::fs::OpenOptionsExt;
 pub fn add_hook() -> Result<String, String> {
   let b: bool = Path::new(".git").is_dir();
   match b {
