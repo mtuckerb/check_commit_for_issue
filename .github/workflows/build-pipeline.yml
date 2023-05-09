@@ -2,7 +2,10 @@ name: release-binaries
 on:
   release:
     types: [published]
-
+  workflow_run:
+    workflows: ["tagged-release"]
+    types:
+      - completed
 env:
   CARGO_TERM_COLOR: always
 
