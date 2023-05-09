@@ -42,7 +42,7 @@ jobs:
       #   env:
       #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       #   with:
-      #     asset_name: check_commit_for_issue-${{ github.event.release.tag-name }}-macos-x86_64.dmg
+      #     asset_name: ${{check_commit_for_issue}}-${{ github.event.release.tag-name }}-macos-x86_64.dmg
       #     asset_path: target/release/check_commit_for_issue.dmg
       #     upload_url: ${{ github.event.release.upload_url }}
       #     asset_content_type: application/octet-stream
@@ -55,5 +55,5 @@ jobs:
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
-          files: check_commit_for_issue-${{ github.event.release.tag-name }}-macos-x86_64.dmg 
+          files: target/release/check_commit_for_issue.dmg 
            
